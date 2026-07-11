@@ -1,88 +1,94 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
-import { FiUploadCloud, FiFile, FiX } from 'react-icons/fi';
+import { useCallback, useId, useState, type ChangeEvent, type DragEvent } from 'react';
+import { FiDownload, FiFileText, FiInfo, FiUpload } from 'react-icons/fi';
 
 interface DropZoneProps {
-  onFile: (file: File) => void;
+  onFile: (file: File | null) => void;
   file: File | null;
   loading: boolean;
 }
 
+const templateCsv = [
+  'created_at,name,email,country_code,mobile_without_country_code,company,city,state,country,lead_owner,crm_status,crm_note,data_source,possession_time,description',
+  '2026-05-13 14:20:48,John Doe,john@example.com,+91,9876543210,GrowEasy,Mumbai,Maharashtra,India,owner@groweasy.ai,GOOD_LEAD_FOLLOW_UP,Asked for a callback,leads_on_demand,,',
+].join('\n');
+
 export default function DropZone({ onFile, file, loading }: DropZoneProps) {
   const [dragging, setDragging] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputId = useId();
 
   const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
+    (event: DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
       setDragging(false);
-      const f = e.dataTransfer.files[0];
-      if (f && f.name.endsWith('.csv')) {
-        onFile(f);
+      const droppedFile = event.dataTransfer.files.item(0);
+      if (droppedFile) {
+        onFile(droppedFile);
       }
     },
     [onFile]
   );
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (f) onFile(f);
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.item(0);
+    if (selectedFile) {
+      onFile(selectedFile);
+    }
+  };
+
+  const downloadTemplate = () => {
+    const blob = new Blob([templateCsv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'groweasy_leads_template.csv';
+    anchor.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
     <div
-      onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+      className={`ge-dropzone${dragging ? ' is-dragging' : ''}${loading ? ' is-loading' : ''}`}
+      onDragOver={(event) => {
+        event.preventDefault();
+        setDragging(true);
+      }}
       onDragLeave={() => setDragging(false)}
       onDrop={handleDrop}
-      onClick={() => inputRef.current?.click()}
-      className={`relative cursor-pointer rounded-2xl border-2 border-dashed p-12 text-center transition-all ${
-        dragging
-          ? 'border-[#294744] bg-[#294744]/5'
-          : 'border-gray-300 dark:border-gray-600 hover:border-[#294744]/50'
-      } ${loading ? 'pointer-events-none opacity-50' : ''}`}
     >
       <input
-        ref={inputRef}
+        id={inputId}
         type="file"
-        accept=".csv"
-        className="hidden"
+        accept=".csv,text/csv"
+        className="sr-only"
         onChange={handleChange}
         disabled={loading}
       />
 
-      {file ? (
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-[#294744]/10 flex items-center justify-center">
-            <FiFile className="w-6 h-6 text-[#294744]" />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{file.name}</p>
-            <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(1)} KB</p>
-          </div>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onFile(null as unknown as File);
-            }}
-            className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700"
-          >
-            <FiX className="w-3 h-3" /> Remove
-          </button>
-        </div>
-      ) : (
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-            <FiUploadCloud className="w-8 h-8 text-gray-400 dark:text-gray-500" />
-          </div>
-          <div>
-            <p className="text-base font-medium text-gray-700 dark:text-gray-300">
-              Drop your CSV here, or <span className="text-[#294744] underline underline-offset-2">browse</span>
-            </p>
-            <p className="text-xs text-gray-400 mt-1">Only .csv files accepted</p>
-          </div>
-        </div>
-      )}
+      <label className="ge-dropzone-target" htmlFor={inputId}>
+        <span className="ge-dropzone-icon">
+          {file ? <FiFileText aria-hidden="true" /> : <FiUpload aria-hidden="true" />}
+        </span>
+        <strong>{file ? file.name : 'Drop your CSV file here'}</strong>
+        <small>{file ? `${(file.size / 1024).toFixed(1)} KB selected` : 'or click to browse files'}</small>
+      </label>
+
+      <div className="ge-support-chip">
+        <FiInfo aria-hidden="true" />
+        Supported file: .csv (max 5MB)
+      </div>
+
+      <p className="ge-dropzone-help">
+        Required headers: created_at, name, email, country_code, mobile_without_country_code,
+        company, city, state, country, lead_owner, crm_status, crm_note.
+        Template includes default + custom CRM fields to reduce upload errors.
+      </p>
+
+      <button className="ge-template-button" type="button" onClick={downloadTemplate}>
+        <FiDownload aria-hidden="true" />
+        Download Sample CSV Template
+      </button>
     </div>
   );
 }

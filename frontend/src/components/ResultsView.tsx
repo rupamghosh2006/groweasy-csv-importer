@@ -1,142 +1,219 @@
 'use client';
 
-import type { ImportResponse, CrmRecord, CrmStatus } from '@/lib/types';
-import { FiDownload, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { useState } from 'react';
+import { FiChevronDown, FiChevronUp, FiDownload, FiMoreHorizontal, FiRefreshCw, FiSearch } from 'react-icons/fi';
+import type { CrmRecord, CrmStatus, ImportResponse } from '@/lib/types';
 
-const statusColors: Record<CrmStatus, string> = {
-  GOOD_LEAD_FOLLOW_UP: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300',
-  DID_NOT_CONNECT: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
-  BAD_LEAD: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300',
-  SALE_DONE: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
-  '': 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400',
+const crmHeaders = [
+  'created_at',
+  'name',
+  'email',
+  'country_code',
+  'mobile_without_country_code',
+  'company',
+  'city',
+  'state',
+  'country',
+  'lead_owner',
+  'crm_status',
+  'crm_note',
+  'data_source',
+  'possession_time',
+  'description',
+] as const;
+
+const statusLabels: Record<CrmStatus, string> = {
+  GOOD_LEAD_FOLLOW_UP: 'Good Lead',
+  DID_NOT_CONNECT: 'Not Dialed',
+  BAD_LEAD: 'Bad Lead',
+  SALE_DONE: 'Sale Done',
+  '': 'Not Dialed',
 };
 
-const crmHeaders = ['created_at', 'name', 'email', 'country_code', 'mobile_without_country_code', 'company', 'city', 'state', 'country', 'lead_owner', 'crm_status', 'crm_note', 'data_source', 'possession_time', 'description'] as const;
+const statusClasses: Record<CrmStatus, string> = {
+  GOOD_LEAD_FOLLOW_UP: 'is-good',
+  DID_NOT_CONNECT: 'is-neutral',
+  BAD_LEAD: 'is-bad',
+  SALE_DONE: 'is-sale',
+  '': 'is-neutral',
+};
 
 export default function ResultsView({ result }: { result: ImportResponse }) {
   const [showSkipped, setShowSkipped] = useState(false);
 
   const downloadCSV = () => {
     const headers = crmHeaders.join(',');
-    const rows = result.imported.map((r) =>
-      (crmHeaders as readonly (keyof CrmRecord)[]).map((h) => {
-        const val = r[h] ?? '';
-        const escaped = val.includes(',') || val.includes('"') || val.includes('\n') ? `"${val.replace(/"/g, '""')}"` : val;
-        return escaped;
-      }).join(',')
+    const rows = result.imported.map((record) =>
+      crmHeaders
+        .map((header) => {
+          const value = String(record[header] ?? '');
+          return value.includes(',') || value.includes('"') || value.includes('\n')
+            ? `"${value.replace(/"/g, '""')}"`
+            : value;
+        })
+        .join(',')
     );
     const csv = [headers, ...rows].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'imported-leads.csv';
-    a.click();
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'groweasy_imported_leads.csv';
+    anchor.click();
     URL.revokeObjectURL(url);
   };
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-3 gap-4">
-        <div className="rounded-xl bg-white dark:bg-[#1a2a2a] border border-gray-200 dark:border-gray-700 p-4 text-center">
-          <p className="text-2xl font-bold text-[#294744] dark:text-[#4a9e9a]">{result.totalImported}</p>
-          <p className="text-xs text-gray-500 mt-1">Imported</p>
-        </div>
-        <div className="rounded-xl bg-white dark:bg-[#1a2a2a] border border-gray-200 dark:border-gray-700 p-4 text-center">
-          <p className="text-2xl font-bold text-amber-600">{result.totalSkipped}</p>
-          <p className="text-xs text-gray-500 mt-1">Skipped</p>
-        </div>
-        <div className="rounded-xl bg-white dark:bg-[#1a2a2a] border border-gray-200 dark:border-gray-700 p-4 text-center">
-          <p className="text-2xl font-bold text-gray-700 dark:text-gray-300">{result.totalRows}</p>
-          <p className="text-xs text-gray-500 mt-1">Total Processed</p>
-        </div>
-      </div>
+    <div className="ge-results">
+      <section className="ge-metrics-grid" aria-label="Import summary">
+        <MetricCard label="Imported" value={result.totalImported} />
+        <MetricCard label="Skipped" value={result.totalSkipped} tone="warning" />
+        <MetricCard label="Total Processed" value={result.totalRows} />
+        <MetricCard label="Success Rate" value={`${getSuccessRate(result)}%`} tone="success" />
+      </section>
 
-      {result.imported.length > 0 && (
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Imported Leads</h3>
-            <button
-              onClick={downloadCSV}
-              className="flex items-center gap-1.5 text-xs font-medium text-[#294744] hover:text-[#1a2d2b] bg-[#294744]/10 hover:bg-[#294744]/20 px-3 py-1.5 rounded-lg transition-colors"
-            >
-              <FiDownload className="w-3.5 h-3.5" /> Export CSV
+      <section className="ge-section">
+        <div className="ge-leads-toolbar">
+          <div>
+            <h2>Your Leads</h2>
+            <p>{result.totalImported} CRM-ready records extracted from the uploaded CSV.</p>
+          </div>
+          <div className="ge-toolbar-actions">
+            <label className="ge-search-box">
+              <FiSearch aria-hidden="true" />
+              <input placeholder="Enter email or phone number..." readOnly />
+            </label>
+            <button className="ge-icon-button dark" type="button" aria-label="Refresh leads">
+              <FiRefreshCw aria-hidden="true" />
+            </button>
+            <button className="ge-secondary-action" type="button" onClick={downloadCSV}>
+              <FiDownload aria-hidden="true" />
+              Export CSV
             </button>
           </div>
-          <div className="overflow-auto border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm max-h-[500px]">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-[#294744] text-white">
-                  <th className="sticky top-0 bg-[#294744] px-3 py-2.5 text-left font-medium whitespace-nowrap">#</th>
-                  {crmHeaders.map((h) => (
-                    <th key={h} className="sticky top-0 bg-[#294744] px-3 py-2.5 text-left font-medium whitespace-nowrap">
-                      {h.replace(/_/g, ' ')}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {result.imported.map((record, idx) => (
-                  <tr
-                    key={idx}
-                    className="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50"
-                  >
-                    <td className="px-3 py-2 text-gray-400 text-xs">{idx + 1}</td>
-                    {(crmHeaders as readonly (keyof CrmRecord)[]).map((h, ci) => {
-                      const val = record[h] ?? '';
-                      if (h === 'crm_status') {
-                        return (
-                          <td key={`${h}-${ci}`} className="px-3 py-2">
-                            {val ? (
-                              <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[val as CrmStatus] || statusColors['']}`}>
-                                {val.replace(/_/g, ' ')}
-                              </span>
-                            ) : (
-                              <span className="text-gray-400">-</span>
-                            )}
-                          </td>
-                        );
-                      }
-                      return (
-                        <td key={`${h}-${ci}`} className="px-3 py-2 whitespace-nowrap max-w-[200px] overflow-hidden text-ellipsis" title={val}>
-                          {val || '-'}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
         </div>
-      )}
+
+        <div className="ge-table-frame is-leads">
+          <table className="ge-data-table ge-leads-table">
+            <thead>
+              <tr>
+                <th>Lead Name</th>
+                <th>Email</th>
+                <th>Contact</th>
+                <th>Date Created</th>
+                <th>Company</th>
+                <th>Status</th>
+                <th>Source</th>
+                <th>Note</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {result.imported.map((record, index) => (
+                <LeadRow record={record} key={`${record.email}-${record.mobile_without_country_code}-${index}`} />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       {result.skipped.length > 0 && (
-        <div className="rounded-xl bg-white dark:bg-[#1a2a2a] border border-gray-200 dark:border-gray-700">
+        <section className="ge-skipped-section">
           <button
-            onClick={() => setShowSkipped(!showSkipped)}
-            className="flex items-center justify-between w-full px-5 py-4 text-left"
+            type="button"
+            className="ge-skipped-toggle"
+            onClick={() => setShowSkipped((current) => !current)}
           >
-            <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              Skipped Records ({result.skipped.length})
-            </span>
-            {showSkipped ? <FiChevronUp className="w-4 h-4 text-gray-400" /> : <FiChevronDown className="w-4 h-4 text-gray-400" />}
+            <span>Skipped Records ({result.skipped.length})</span>
+            {showSkipped ? <FiChevronUp aria-hidden="true" /> : <FiChevronDown aria-hidden="true" />}
           </button>
+
           {showSkipped && (
-            <div className="border-t border-gray-100 dark:border-gray-700 px-5 py-4 space-y-3 max-h-[400px] overflow-y-auto">
-              {result.skipped.map((s, idx) => (
-                <div key={idx} className="text-sm p-3 rounded-lg bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20">
-                  <p className="text-red-600 dark:text-red-400 font-medium text-xs mb-1">Reason: {s.reason}</p>
-                  <pre className="text-xs text-gray-500 dark:text-gray-400 overflow-x-auto whitespace-pre-wrap">
-                    {JSON.stringify(s.original_row, null, 2)}
-                  </pre>
-                </div>
+            <div className="ge-skipped-list">
+              {result.skipped.map((skipped, index) => (
+                <article className="ge-skipped-item" key={`${skipped.reason}-${index}`}>
+                  <strong>Reason: {skipped.reason}</strong>
+                  <pre>{JSON.stringify(skipped.original_row, null, 2)}</pre>
+                </article>
               ))}
             </div>
           )}
-        </div>
+        </section>
       )}
     </div>
   );
+}
+
+function MetricCard({
+  label,
+  value,
+  tone = 'default',
+}: {
+  label: string;
+  value: number | string;
+  tone?: 'default' | 'success' | 'warning';
+}) {
+  return (
+    <article className={`ge-metric-card is-${tone}`}>
+      <strong>{value}</strong>
+      <span>{label}</span>
+    </article>
+  );
+}
+
+function LeadRow({ record }: { record: CrmRecord }) {
+  const status: CrmStatus = record.crm_status || '';
+  const contact = [record.country_code, record.mobile_without_country_code].filter(Boolean).join(' ');
+
+  return (
+    <tr>
+      <td>
+        <strong>{record.name || 'Unnamed Lead'}</strong>
+      </td>
+      <td title={record.email}>{record.email || '-'}</td>
+      <td>{contact || '-'}</td>
+      <td>{formatDate(record.created_at)}</td>
+      <td>{record.company || '-'}</td>
+      <td>
+        <span className={`ge-status-pill ${statusClasses[status] ?? statusClasses['']}`}>
+          {statusLabels[status] ?? statusLabels['']}
+        </span>
+      </td>
+      <td>{record.data_source ? record.data_source.replace(/_/g, ' ') : '-'}</td>
+      <td title={record.crm_note || record.description}>{record.crm_note || record.description || '-'}</td>
+      <td>
+        <button className="ge-row-action" type="button">
+          More
+          <FiMoreHorizontal aria-hidden="true" />
+        </button>
+      </td>
+    </tr>
+  );
+}
+
+function formatDate(value: string) {
+  if (!value) {
+    return '-';
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleString('en-IN', {
+    month: 'short',
+    day: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+function getSuccessRate(result: ImportResponse) {
+  if (result.totalRows === 0) {
+    return 0;
+  }
+
+  return Math.round((result.totalImported / result.totalRows) * 100);
 }
