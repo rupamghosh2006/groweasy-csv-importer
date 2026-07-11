@@ -1,173 +1,115 @@
-# GrowEasy — AI-Powered CRM CSV Importer
+# GrowEasy CRM CSV Importer
 
-Upload any CSV (Facebook Lead Ads, Google Ads, real-estate CRMs, Zoho exports, manual spreadsheets) and get its columns intelligently mapped into a fixed CRM schema using Groq AI (free tier). The core challenge solved here is **AI field mapping** — not CSV parsing.
+AI-powered CSV importer that maps lead exports from different sources into a fixed GrowEasy CRM schema.
 
-**Live App:** https://groweasy-csv-importer-six-beta.vercel.app  
-**Backend API:** https://groweasy-csv-importer-yi3v.onrender.com  
-**GitHub Repo:** https://github.com/rupamghosh2006/groweasy-csv-importer  
+The application lets users upload a CSV, preview the parsed rows, confirm the import, and receive normalized CRM records generated with Groq AI. Rows without an email or mobile number are skipped with a clear reason.
 
----
+## Links
+
+| Resource | URL |
+| --- | --- |
+| Frontend | https://groweasy-csv-importer-six-beta.vercel.app |
+| Backend API | https://groweasy-csv-importer-yi3v.onrender.com |
+| Repository | https://github.com/rupamghosh2006/groweasy-csv-importer |
 
 ## Features
 
-- **Drag & drop CSV upload** with file validation
-- **Client-side CSV preview** — see your data before importing
-- **AI-powered field mapping** — Groq (Llama 3.3 70B) intelligently maps any column structure to the fixed CRM schema
-- **Batch processing** — rows split into batches of 25, processed with 3-way concurrency
-- **Automatic retry** — failed batches retry up to 2x with exponential backoff
-- **Smart skip logic** — rows without email or mobile number are flagged, never fabricated
-- **CSV export** — download mapped results
-- **Dark mode** — toggle in the header
-- **Responsive** — works on mobile and desktop
-- **Color-coded status badges** — `GOOD_LEAD_FOLLOW_UP`, `DID_NOT_CONNECT`, `BAD_LEAD`, `SALE_DONE`
-
----
+- CSV upload with drag-and-drop and file picker support
+- Client-side CSV preview before AI processing
+- AI field mapping for varied CSV formats and column names
+- Batch processing with concurrency and retry handling
+- Skipped-record reporting for rows without contact details
+- Mapped CRM result table with CSV export
+- Responsive UI with dark mode
+- Stateless backend with no database dependency
 
 ## Tech Stack
 
 | Layer | Technology |
-|---|---|
-| Frontend | Next.js 16 (App Router), TypeScript, Tailwind CSS |
-| Backend | Node.js + Express 5, TypeScript |
-| AI | Groq (Llama 3.3 70B Versatile) — free tier |
-| CSV Parsing | PapaParse (frontend), csv-parse (backend-ready) |
-| Database | None (stateless, in-memory processing per request) |
+| --- | --- |
+| Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS |
+| Backend | Node.js, Express 5, TypeScript |
+| AI | Groq Llama 3.3 70B via OpenAI-compatible SDK |
+| CSV parsing | PapaParse |
+| Deployment | Vercel frontend, Render backend |
+| CI/CD | GitHub Actions |
 
----
+## Project Structure
 
-## Architecture
-
-```
-┌─────────────┐         POST /api/import          ┌──────────────┐
-│  Vercel     │  ──────── { rows: [...] } ──────→  │   Render     │
-│  (Next.js)  │  ←────── { imported, skipped } ──  │  (Express)   │
-└─────────────┘                                    └──────┬───────┘
-       │                                                    │
-       │ 40 KB CSVs                                         │ 1. Split into batches of 25
-       │ parsed client-side                                 │ 2. Send each batch to Groq AI
-       │ via PapaParse                                      │ 3. Parse & validate JSON response
-       │                                                    │ 4. Retry on failure (2x, backoff)
-                                                           │ 5. Return structured result
-```
-
-### Monorepo Structure
-
-```
+```text
 groweasy/
-├── frontend/                    # Next.js app (Vercel)
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── page.tsx         # Main 4-step flow (Upload → Preview → Confirm → Result)
-│   │   │   ├── layout.tsx       # Root layout with Inter font
-│   │   │   └── globals.css      # GrowEasy brand tokens
-│   │   ├── components/
-│   │   │   ├── DropZone.tsx     # Drag & drop file upload
-│   │   │   ├── PreviewTable.tsx # Raw CSV preview with sticky headers
-│   │   │   ├── ResultsView.tsx  # Mapped records + skipped rows + CSV export
-│   │   │   ├── StepIndicator.tsx# 4-step progress bar
-│   │   │   └── ThemeProvider.tsx# Dark mode context
-│   │   └── lib/
-│   │       └── types.ts         # Shared TypeScript interfaces
-│   └── public/assets/
-│       └── logo.svg             # GrowEasy brand logo
-├── server/                      # Express API (Render)
-│   └── src/
-│       ├── index.ts             # POST /api/import — batching, concurrency, retries
-│       ├── groq.ts            # Groq AI client (OpenAI-compatible SDK)
-│       ├── prompt.ts            # AI prompt with 4 few-shot examples + response validator
-│       └── types.ts             # Shared types
-├── samples/                     # Test CSV files
-│   ├── facebook-leads-export.csv
-│   ├── google-ads-export.csv
-│   └── messy-manual-sheet.csv
-├── .env.example
-├── .gitignore
-└── README.md
+  frontend/          Next.js application
+  server/            Express API
+  samples/           Sample CSV files for manual testing
+  assets/            Project assets
+  .github/workflows/ GitHub Actions workflows
 ```
 
----
-
-## Setup
+## Local Setup
 
 ### Prerequisites
 
-- Node.js 18+
-- A free Groq API key from [Groq Console](https://console.groq.com) (sign up, create key — free tier)
+- Node.js 22 recommended
+- Groq API key from https://console.groq.com
 
-### 1. Clone
-
-```bash
-git clone https://github.com/rupamghosh2006/groweasy-csv-importer.git
-cd groweasy-csv-importer
-```
-
-### 2. Server (Express)
+### Backend
 
 ```bash
 cd server
+npm install
 cp .env.example .env
+npm run dev
 ```
 
-Edit `server/.env`:
+Set the backend environment variables in `server/.env`:
 
 ```env
-GROQ_API_KEY=gsk_your_actual_groq_key
+GROQ_API_KEY=your_groq_api_key_here
 PORT=3001
 BATCH_SIZE=25
 CONCURRENCY=2
 MAX_RETRIES=2
 ```
 
-Install & run:
+The backend runs at `http://localhost:3001`.
 
-```bash
-npm install
-npm run dev
-```
-
-Server starts at **http://localhost:3001**.
-
-### 3. Frontend (Next.js)
+### Frontend
 
 ```bash
 cd frontend
+npm install
 cp .env.example .env.local
+npm run dev
 ```
 
-Edit `frontend/.env.local`:
+Set the frontend environment variable in `frontend/.env.local`:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
-Install & run:
+The frontend runs at `http://localhost:3000`.
 
-```bash
-npm install
-npm run dev
-```
+## API
 
-Frontend starts at **http://localhost:3000**.
-
----
-
-## API Reference
-
-### POST /api/import
+### `POST /api/import`
 
 Accepts parsed CSV rows as JSON.
 
-**Request:**
 ```json
 {
   "rows": [
-    { "Full Name": "John Doe", "Email": "john@example.com", ... },
-    { ... }
+    {
+      "Full Name": "John Doe",
+      "Email": "john@example.com",
+      "Phone": "+91 9876543210"
+    }
   ]
 }
 ```
 
-**Success Response (200):**
+Returns imported CRM records, skipped rows, and totals.
+
 ```json
 {
   "imported": [
@@ -175,242 +117,140 @@ Accepts parsed CSV rows as JSON.
       "created_at": "",
       "name": "John Doe",
       "email": "john@example.com",
-      "country_code": "+1",
-      "mobile_without_country_code": "5551234567",
-      "company": "Acme Corp",
-      "city": "New York",
+      "country_code": "+91",
+      "mobile_without_country_code": "9876543210",
+      "company": "",
+      "city": "",
       "state": "",
       "country": "",
       "lead_owner": "",
       "crm_status": "GOOD_LEAD_FOLLOW_UP",
-      "crm_note": "Source: Facebook Ad",
+      "crm_note": "",
       "data_source": "",
       "possession_time": "",
       "description": ""
     }
   ],
-  "skipped": [
-    {
-      "original_row": { "Comment": "Just browsing" },
-      "reason": "no email or mobile number found"
-    }
-  ],
+  "skipped": [],
   "totalImported": 1,
-  "totalSkipped": 1,
-  "totalRows": 2
+  "totalSkipped": 0,
+  "totalRows": 1
 }
 ```
 
-**Error Responses:**
-| Status | Meaning |
-|---|---|
-| 400 | Invalid body, empty rows, or exceeds 5000 rows |
-| 500 | Internal error or AI failure (details in `error` field) |
+Validation:
 
----
+- Request body must be `{ "rows": [...] }`
+- Maximum import size is 5000 rows
+- Rows without email and mobile are returned in `skipped`
+- `crm_status` is limited to `GOOD_LEAD_FOLLOW_UP`, `DID_NOT_CONNECT`, `BAD_LEAD`, or `SALE_DONE`
+- `data_source` is limited to `leads_on_demand`, `meridian_tower`, `eden_park`, `varah_swamy`, or `sarjapur_plots`
 
 ## CRM Schema
 
-| Field | Type | Description | Rules |
-|---|---|---|---|
-| `created_at` | string | Lead creation date | Must be parseable by `new Date()`. Format: YYYY-MM-DD HH:mm:ss |
-| `name` | string | Lead name | Extracted from any name-like column |
-| `email` | string | Primary email | First email found; rest go in `crm_note` |
-| `country_code` | string | Country code (e.g. +91) | Extracted from phone fields |
-| `mobile_without_country_code` | string | Mobile number | First number found; rest go in `crm_note` |
-| `company` | string | Company name | — |
-| `city` | string | City | — |
-| `state` | string | State | — |
-| `country` | string | Country | — |
-| `lead_owner` | string | Lead owner | — |
-| `crm_status` | enum | Lead status | `GOOD_LEAD_FOLLOW_UP`, `DID_NOT_CONNECT`, `BAD_LEAD`, `SALE_DONE` |
-| `crm_note` | string | Catch-all | Remarks, extra emails/phones, unmapped data |
-| `data_source` | enum | Source | `leads_on_demand`, `meridian_tower`, `eden_park`, `varah_swamy`, `sarjapur_plots` |
-| `possession_time` | string | Property possession time | — |
-| `description` | string | Additional description | — |
+The AI maps source data into these fields:
 
----
-
-## AI Prompt Engineering
-
-The AI prompt includes:
-
-1. **System instructions** — full schema definition with all 15 fields
-2. **8 precise extraction rules**:
-   - `crm_status` limited to 4 enum values
-   - `data_source` limited to 5 enum values (matched by project context)
-   - `created_at` normalization to `YYYY-MM-DD HH:mm:ss`
-   - `crm_note` as catch-all for extra info
-   - Multiple emails/mobiles → first in field, rest in `crm_note`
-   - CSV safety — newlines escaped as `\n`
-   - **Skip rule** — rows without email AND mobile are rejected
-   - No hallucinated values
-3. **4 few-shot examples** showing:
-   - Standard Facebook Lead Ad mapping
-   - Multiple emails/phones with messy headers
-   - Skipped row (no contact info)
-   - Real estate CSV with property context (`sarjapur_plots`)
-4. **Output format** enforce — strict JSON only, no markdown fences
-
-Response post-processing strips markdown fences, extracts JSON, and validates every mapped field against the allowed enums before accepting.
-
----
-
-## Backend Processing Pipeline
-
-```
-Raw rows → Split into batches (25 each) → Process 3 batches concurrently
-  → For each batch:
-      1. Build prompt with schema + few-shot examples + batch rows
-      2. Send to Groq (Llama 3.3 70B)
-      3. Parse & validate JSON response
-      4. If malformed → retry (up to 2x with 2s/4s backoff)
-      5. If all retries fail → add to skipped with error reason
-  → Aggregate all imported + skipped records
-  → Return final response
+```text
+created_at
+name
+email
+country_code
+mobile_without_country_code
+company
+city
+state
+country
+lead_owner
+crm_status
+crm_note
+data_source
+possession_time
+description
 ```
 
----
+Mapping rules:
 
-## Testing
+- Use the first email and first mobile number as primary contact details
+- Put extra emails, extra phone numbers, remarks, and unmapped useful data in `crm_note`
+- Leave fields blank when the source row does not provide enough evidence
+- Do not fabricate missing values
+- Keep each mapped record CSV-safe
 
-Sample CSVs are in the `samples/` folder for quick end-to-end testing:
+## Sample Data
 
-```bash
-# Facebook Lead Ads style
+Use the files in `samples/` for manual testing:
+
+```text
 samples/facebook-leads-export.csv
-
-# Google Ads style
 samples/google-ads-export.csv
-
-# Mixed columns, multiple emails/phones, row with no contact info
 samples/messy-manual-sheet.csv
 ```
 
-**Edge cases handled:**
-- ✅ Empty CSV files
-- ✅ Non-CSV files rejected
-- ✅ Rows missing both email and mobile → skipped with reason
-- ✅ Multiple emails in one cell → first mapped, rest in notes
-- ✅ Multiple phones in one cell → first mapped, rest in notes
-- ✅ Ambiguous column headers (e.g. "Contact" = phone number)
-- ✅ groq/Groq API rate limits (429) → retries with backoff
-- ✅ Malformed AI JSON → retry mechanism
-- ✅ Maximum 5000 rows per request
+## Quality Checks
 
----
+Run these before pushing changes:
+
+```bash
+cd frontend
+npm run lint
+npm run build
+```
+
+```bash
+cd server
+npx tsc --noEmit
+npm run build
+```
 
 ## Deployment
 
-### Frontend → Vercel
+### Frontend: Vercel
 
-1. Push the repo to GitHub
-2. On Vercel, click **Add New → Project**
-3. Import `rupamghosh2006/groweasy-csv-importer`
-4. Configure:
-   - **Framework Preset:** Next.js (auto-detected)
-   - **Root Directory:** `frontend`
-5. Deploy
-6. In **Settings → Environment Variables**, add:
-   - `NEXT_PUBLIC_API_URL` = `https://groweasy-csv-importer-yi3v.onrender.com`
+- Root directory: `frontend`
+- Build command: `npm run build`
+- Environment variable:
 
-### Backend → Render
-
-1. On Render, click **New + → Web Service**
-2. Connect your GitHub repo
-3. Configure:
-   - **Name:** `groweasy-csv-importer-server`
-   - **Root Directory:** `server`
-   - **Runtime:** Node
-   - **Build Command:** `npm install && npx tsc`
-   - **Start Command:** `node dist/index.js`
-4. Add environment variables:
-   - `GROQ_API_KEY` = your Groq API key
-   - `NODE_VERSION` = 18
-
----
-
-## User Flow
-
-```
-Step 1: Upload CSV
-  ┌─────────────────────────────┐
-  │  Drag & drop or browse .csv │
-  │  File validated client-side │
-  └─────────────┬───────────────┘
-                ↓
-Step 2: Preview
-  ┌─────────────────────────────┐
-  │  Raw CSV shown in table     │
-  │  Sticky headers, scrollable │
-  │  Row count displayed        │
-  │  NO AI call yet             │
-  └─────────────┬───────────────┘
-                ↓
-Step 3: Confirm
-  ┌─────────────────────────────┐
-  │  "Confirm & Import" button  │
-  │  Progress: "Batch 2 of 5..."│
-  │  Sends rows to backend API  │
-  └─────────────┬───────────────┘
-                ↓
-Step 4: Result
-  ┌─────────────────────────────┐
-  │  Summary: Imported / Skipped│
-  │  Mapped CRM records table   │
-  │  Color-coded status badges  │
-  │  Collapsible skipped list   │
-  │  Download as CSV button     │
-  └─────────────────────────────┘
+```env
+NEXT_PUBLIC_API_URL=https://groweasy-csv-importer-yi3v.onrender.com
 ```
 
----
+### Backend: Render
 
-## Bonus Features Implemented
+- Root directory: `server`
+- Build command: `npm install && npx tsc`
+- Start command: `node dist/index.js`
+- Environment variables:
 
-- [x] Drag & drop upload — dashed dropzone with highlight on drag
-- [x] Progress indicator during AI processing — "Processing batch X of Y"
-- [x] Retry mechanism for failed AI batches — 2 retries with exponential backoff
-- [x] Dark mode toggle — stored in localStorage, persists across sessions
-- [x] Virtualized scrolling — max-height tables with overflow scroll for large CSVs
-- [x] Responsive design — mobile-first with stacked layouts
-- [x] CSV export — download mapped results as clean CSV
-- [x] Loading skeletons — spinner during parsing and import
-- [x] Error boundaries — friendly error messages, never raw stack traces
-- [x] Environment-based config — `.env` for API keys, batch size, concurrency
+```env
+GROQ_API_KEY=your_groq_api_key_here
+PORT=10000
+NODE_VERSION=18
+```
 
----
+## CI/CD
 
-## Known Limitations
+GitHub Actions workflows are defined in `.github/workflows/`.
 
-- Maximum **5000 rows** per import (configurable in env)
-- Preview shows only **first 100 rows** (full data sent to AI)
-- No database — results returned as JSON only; download CSV to persist
-- Groq free tier has rate limits (30 req/min for Llama 3.3 70B); reduce `CONCURRENCY` to 1 if hitting limits
-- AI may occasionally return malformed JSON; retry mechanism handles most cases
+- `frontend.yml` runs install, lint, build, and production Vercel deploy on `master`
+- `server.yml` runs install, TypeScript checks, build, and triggers Render deploy on `master`
 
----
+Required GitHub repository secrets:
 
-## Submission
+```text
+VERCEL_TOKEN
+RENDER_DEPLOY_HOOK_URL
+```
 
-| Field | Value |
-|---|---|
-| **Position Applied** | Software Developer Intern |
-| **Hosted App URL** | https://groweasy-csv-importer-six-beta.vercel.app |
-| **Backend API** | https://groweasy-csv-importer-yi3v.onrender.com |
-| **GitHub Repo** | https://github.com/rupamghosh2006/groweasy-csv-importer |
-| **Email to** | varun@groweasy.ai |
+If using Vercel CLI deployment without a committed `.vercel/project.json`, also configure:
 
-### Submission Checklist
-- [x] Publicly hosted frontend (Vercel)
-- [x] Publicly hosted backend (Render)
-- [x] Public GitHub repository
-- [x] README with setup instructions
-- [x] `.env.example` for both frontend + server
-- [x] Sample CSVs included
-- [x] AI field mapping with Groq (free tier)
-- [x] Drag & drop upload
-- [x] Progress indicators
-- [x] Retry mechanism
-- [x] Dark mode
-- [x] Responsive design
+```text
+VERCEL_ORG_ID
+VERCEL_PROJECT_ID
+```
+
+## Limitations
+
+- No database persistence; results are returned in the response and can be exported as CSV
+- Maximum request size is 5000 rows
+- AI output can vary, so the backend validates enum fields and retries malformed responses
+- Groq free-tier rate limits may require lower concurrency for large imports
