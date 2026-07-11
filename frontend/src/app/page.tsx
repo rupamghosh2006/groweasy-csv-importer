@@ -15,10 +15,12 @@ import {
   FiLink2,
   FiMessageSquare,
   FiMoreHorizontal,
+  FiMoon,
   FiPhone,
   FiPlus,
   FiRefreshCw,
   FiSettings,
+  FiSun,
   FiUpload,
   FiUsers,
   FiWifi,
@@ -29,6 +31,7 @@ import type { ImportResponse, Step } from '@/lib/types';
 import DropZone from '@/components/DropZone';
 import PreviewTable from '@/components/PreviewTable';
 import ResultsView from '@/components/ResultsView';
+import { useTheme } from '@/components/ThemeProvider';
 
 type NavItem = {
   label: string;
@@ -260,9 +263,12 @@ export default function Home() {
 function Sidebar() {
   return (
     <aside className="ge-sidebar" aria-label="GrowEasy navigation">
-      <div className="ge-brand">
-        <GrowEasyMark />
-        <span>GrowEasy</span>
+      <div className="ge-sidebar-header">
+        <div className="ge-brand">
+          <GrowEasyMark />
+          <span>GrowEasy</span>
+        </div>
+        <ThemeToggle />
       </div>
 
       <button className="ge-account-switcher" type="button">
@@ -310,10 +316,26 @@ function MobileHeader({ onImport }: { onImport: () => void }) {
         <GrowEasyMark />
         <span>GrowEasy</span>
       </div>
-      <button className="ge-icon-button" type="button" onClick={onImport} aria-label="Import leads">
-        <FiUpload aria-hidden="true" />
-      </button>
+      <div className="ge-mobile-actions">
+        <ThemeToggle />
+        <button className="ge-icon-button" type="button" onClick={onImport} aria-label="Import leads">
+          <FiUpload aria-hidden="true" />
+        </button>
+      </div>
     </header>
+  );
+}
+
+function ThemeToggle() {
+  const { theme, toggle } = useTheme();
+  const isDark = theme === 'dark';
+  const label = isDark ? 'Switch to light mode' : 'Switch to dark mode';
+  const Icon = isDark ? FiSun : FiMoon;
+
+  return (
+    <button className="ge-theme-toggle" type="button" onClick={toggle} aria-label={label} title={label}>
+      <Icon aria-hidden="true" />
+    </button>
   );
 }
 
@@ -578,10 +600,10 @@ function FileSummary({
 function GrowEasyMark() {
   return (
     <svg viewBox="0 0 212 212" aria-hidden="true" focusable="false">
-      <rect x="4" y="4" width="204" height="204" rx="44" fill="#101513" />
-      <path d="M153.5 102.3 28.3 227.4-11.2 187.9 114 62.7l39.5 39.6Z" fill="#fff" />
-      <path d="M40.5 62.7h113v39.6h-113V62.7Z" fill="#fff" />
-      <path d="M153.5 62.7v113h-39.6v-113h39.6Z" fill="#fff" />
+      <rect x="4" y="4" width="204" height="204" rx="44" fill="var(--ge-mark-bg)" />
+      <path d="M153.5 102.3 28.3 227.4-11.2 187.9 114 62.7l39.5 39.6Z" fill="var(--ge-mark-fg)" />
+      <path d="M40.5 62.7h113v39.6h-113V62.7Z" fill="var(--ge-mark-fg)" />
+      <path d="M153.5 62.7v113h-39.6v-113h39.6Z" fill="var(--ge-mark-fg)" />
     </svg>
   );
 }

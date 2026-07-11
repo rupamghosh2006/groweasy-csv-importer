@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme inline {
   --color-background: #f7faf8;
   --color-foreground: #111513;
@@ -8,19 +10,118 @@
 }
 
 :root {
+  color-scheme: light;
   --ge-ink: #111513;
   --ge-muted: #6b7471;
   --ge-soft: #eef7f5;
   --ge-line: #e7ecea;
+  --ge-table-line: #edf1ef;
   --ge-page: #fbfcfb;
   --ge-sidebar: #ffffff;
+  --ge-surface: #ffffff;
+  --ge-surface-raised: #ffffff;
+  --ge-surface-soft: #f7fbfa;
+  --ge-surface-muted: #f5f7f6;
+  --ge-surface-hover: #f9fbfa;
   --ge-teal: #185d54;
   --ge-teal-soft: #dff2ef;
   --ge-orange: #ff7043;
   --ge-orange-hover: #f15e32;
   --ge-orange-soft: #ffe3d7;
   --ge-danger: #d94343;
+  --ge-nav-text: #28322f;
+  --ge-section-label: #a3aaa7;
+  --ge-subtle-text: #74807c;
+  --ge-chip-text: #6a7470;
+  --ge-help-text: #7b8581;
+  --ge-control-text: #4a5551;
+  --ge-dashed-line: #ccd8d5;
+  --ge-dropzone-line: #cbd6d2;
+  --ge-dropzone-icon-line: #cfe0dc;
+  --ge-template-line: #b7dad4;
+  --ge-file-action: #6d7773;
+  --ge-table-ink: #222926;
+  --ge-table-text: #3d4743;
+  --ge-lead-name: #1f2825;
+  --ge-row-action-text: #2e3835;
+  --ge-pre-text: #6c7471;
+  --ge-modal-scrim: rgba(12, 14, 13, 0.62);
+  --ge-error-line: #ffd4d4;
+  --ge-error-bg: #fff4f4;
+  --ge-skipped-line: #ffdada;
+  --ge-skipped-bg: #fff6f6;
+  --ge-status-good-bg: #dff8e9;
+  --ge-status-good-text: #128343;
+  --ge-status-neutral-bg: #eef1f0;
+  --ge-status-neutral-text: #6b7471;
+  --ge-status-bad-bg: #ffe3e3;
+  --ge-status-bad-text: #b83232;
+  --ge-status-sale-bg: #e5efff;
+  --ge-status-sale-text: #2769d8;
+  --ge-card-shadow: 0 10px 24px rgba(16, 29, 25, 0.04);
+  --ge-metric-shadow: 0 10px 22px rgba(17, 38, 32, 0.04);
+  --ge-modal-shadow: 0 30px 90px rgba(0, 0, 0, 0.24);
+  --ge-mobile-header-bg: rgba(255, 255, 255, 0.92);
+  --ge-mark-bg: #101513;
+  --ge-mark-fg: #ffffff;
   --ge-radius: 8px;
+}
+
+html.dark {
+  color-scheme: dark;
+  --ge-ink: #f4f7f5;
+  --ge-muted: #a7b4ae;
+  --ge-soft: #13251f;
+  --ge-line: #263730;
+  --ge-table-line: #23342e;
+  --ge-page: #0d1210;
+  --ge-sidebar: #111917;
+  --ge-surface: #141d1a;
+  --ge-surface-raised: #18231f;
+  --ge-surface-soft: #101a17;
+  --ge-surface-muted: #1c2925;
+  --ge-surface-hover: #1a2622;
+  --ge-teal: #63d6c9;
+  --ge-teal-soft: rgba(77, 184, 172, 0.2);
+  --ge-orange: #ff855f;
+  --ge-orange-hover: #ff764d;
+  --ge-orange-soft: rgba(255, 112, 67, 0.16);
+  --ge-danger: #ff7676;
+  --ge-nav-text: #dbe6e1;
+  --ge-section-label: #6f7d77;
+  --ge-subtle-text: #91a09a;
+  --ge-chip-text: #b1beb8;
+  --ge-help-text: #8f9d97;
+  --ge-control-text: #c8d5cf;
+  --ge-dashed-line: #3a4c45;
+  --ge-dropzone-line: #394a43;
+  --ge-dropzone-icon-line: #34554e;
+  --ge-template-line: #34766c;
+  --ge-file-action: #aebbb5;
+  --ge-table-ink: #e9f0ed;
+  --ge-table-text: #c4d0ca;
+  --ge-lead-name: #f6faf8;
+  --ge-row-action-text: #dce7e2;
+  --ge-pre-text: #b6c3bd;
+  --ge-modal-scrim: rgba(0, 0, 0, 0.72);
+  --ge-error-line: rgba(255, 118, 118, 0.34);
+  --ge-error-bg: rgba(255, 118, 118, 0.1);
+  --ge-skipped-line: rgba(255, 118, 118, 0.28);
+  --ge-skipped-bg: rgba(255, 118, 118, 0.08);
+  --ge-status-good-bg: rgba(35, 197, 115, 0.18);
+  --ge-status-good-text: #74e0a3;
+  --ge-status-neutral-bg: rgba(174, 190, 183, 0.14);
+  --ge-status-neutral-text: #b8c5bf;
+  --ge-status-bad-bg: rgba(255, 103, 103, 0.16);
+  --ge-status-bad-text: #ff9b9b;
+  --ge-status-sale-bg: rgba(86, 142, 255, 0.18);
+  --ge-status-sale-text: #9dbdff;
+  --ge-card-shadow: 0 14px 34px rgba(0, 0, 0, 0.22);
+  --ge-metric-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+  --ge-modal-shadow: 0 30px 90px rgba(0, 0, 0, 0.48);
+  --ge-mobile-header-bg: rgba(17, 25, 23, 0.92);
+  --ge-mark-bg: #f4faf7;
+  --ge-mark-fg: #0e1512;
 }
 
 * {
@@ -37,6 +138,7 @@ body {
   background: var(--ge-page);
   color: var(--ge-ink);
   font-family: "Inter", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  transition: background 180ms ease, color 180ms ease;
 }
 
 button,
@@ -46,6 +148,10 @@ input {
 
 button {
   color: inherit;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
 }
 
 .ge-app-shell {
@@ -65,6 +171,13 @@ button {
   padding: 24px 18px 18px;
   background: var(--ge-sidebar);
   border-right: 1px solid var(--ge-line);
+}
+
+.ge-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .ge-brand {
@@ -92,7 +205,7 @@ button {
   padding: 9px;
   border: 1px solid var(--ge-line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--ge-surface-raised);
   text-align: left;
 }
 
@@ -139,7 +252,7 @@ button {
 .ge-nav-section p {
   margin: 0 0 4px;
   padding: 0 10px;
-  color: #a3aaa7;
+  color: var(--ge-section-label);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0;
@@ -157,7 +270,7 @@ button {
   border: 0;
   border-radius: 999px;
   background: transparent;
-  color: #28322f;
+  color: var(--ge-nav-text);
   font-size: 13px;
   font-weight: 700;
   text-align: left;
@@ -174,6 +287,30 @@ button {
   color: var(--ge-teal);
 }
 
+.ge-theme-toggle {
+  width: 36px;
+  height: 36px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 36px;
+  border: 1px solid var(--ge-line);
+  border-radius: var(--ge-radius);
+  background: var(--ge-surface-raised);
+  color: var(--ge-control-text);
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.ge-theme-toggle:hover {
+  border-color: var(--ge-teal);
+  background: var(--ge-surface-hover);
+  color: var(--ge-teal);
+}
+
+.ge-theme-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+
 .ge-business-center {
   margin-top: auto;
   border-radius: var(--ge-radius);
@@ -186,6 +323,12 @@ button {
 
 .ge-mobile-header {
   display: none;
+}
+
+.ge-mobile-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .ge-page {
@@ -244,9 +387,9 @@ button {
   align-items: center;
   gap: 16px;
   padding: 18px 20px;
-  border: 1px dashed #ccd8d5;
+  border: 1px dashed var(--ge-dashed-line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--ge-surface-raised);
   text-align: left;
   transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
 }
@@ -254,7 +397,7 @@ button {
 .ge-import-source:hover,
 .ge-manual-source:hover {
   border-color: var(--ge-teal);
-  background: #f7fbfa;
+  background: var(--ge-surface-hover);
   transform: translateY(-1px);
 }
 
@@ -275,8 +418,8 @@ button {
 }
 
 .ge-source-icon.muted {
-  background: #f5f7f6;
-  color: #74807c;
+  background: var(--ge-surface-muted);
+  color: var(--ge-subtle-text);
 }
 
 .ge-import-source strong,
@@ -320,8 +463,8 @@ button {
   padding: 20px;
   border: 1px solid var(--ge-line);
   border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 10px 24px rgba(16, 29, 25, 0.04);
+  background: var(--ge-surface-raised);
+  box-shadow: var(--ge-card-shadow);
 }
 
 .ge-provider-head,
@@ -338,7 +481,7 @@ button {
   display: grid;
   place-items: center;
   border-radius: 12px;
-  background: color-mix(in srgb, var(--source-color) 13%, white);
+  background: color-mix(in srgb, var(--source-color) 15%, var(--ge-surface));
   color: var(--source-color);
   font-size: 19px;
   font-weight: 900;
@@ -385,7 +528,7 @@ button {
   padding: 8px 13px;
   border: 1px solid var(--ge-line);
   border-radius: var(--ge-radius);
-  background: #fff;
+  background: var(--ge-surface-raised);
   color: var(--ge-ink);
   font-size: 12px;
   font-weight: 800;
@@ -409,13 +552,13 @@ button {
   place-items: center;
   border: 1px solid var(--ge-line);
   border-radius: var(--ge-radius);
-  background: #fff;
-  color: #4a5551;
+  background: var(--ge-surface-raised);
+  color: var(--ge-control-text);
 }
 
 .ge-icon-button.dark {
   background: var(--ge-teal);
-  color: #fff;
+  color: var(--ge-page);
   border-color: var(--ge-teal);
 }
 
@@ -427,7 +570,7 @@ button {
   align-items: center;
   justify-content: center;
   padding: 28px;
-  background: rgba(12, 14, 13, 0.62);
+  background: var(--ge-modal-scrim);
 }
 
 .ge-import-modal {
@@ -437,8 +580,8 @@ button {
   overflow: auto;
   padding: 26px;
   border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.24);
+  background: var(--ge-surface-raised);
+  box-shadow: var(--ge-modal-shadow);
 }
 
 .ge-import-modal.is-wide {
@@ -477,16 +620,16 @@ button {
   justify-items: center;
   gap: 13px;
   padding: 34px 28px 30px;
-  border: 1px dashed #cbd6d2;
+  border: 1px dashed var(--ge-dropzone-line);
   border-radius: var(--ge-radius);
-  background: #fff;
+  background: var(--ge-surface-raised);
   text-align: center;
   transition: border-color 160ms ease, background 160ms ease;
 }
 
 .ge-dropzone.is-dragging {
   border-color: var(--ge-teal);
-  background: #f4fbfa;
+  background: var(--ge-surface-hover);
 }
 
 .ge-dropzone.is-loading {
@@ -506,10 +649,10 @@ button {
   height: 54px;
   display: grid;
   place-items: center;
-  border: 1px solid #cfe0dc;
+  border: 1px solid var(--ge-dropzone-icon-line);
   border-radius: 12px;
   color: var(--ge-teal);
-  background: #fff;
+  background: var(--ge-surface);
 }
 
 .ge-dropzone-icon svg {
@@ -535,8 +678,8 @@ button {
   min-height: 28px;
   padding: 7px 12px;
   border-radius: 999px;
-  background: #f5f7f6;
-  color: #6a7470;
+  background: var(--ge-surface-muted);
+  color: var(--ge-chip-text);
   font-size: 11px;
   font-weight: 800;
 }
@@ -544,7 +687,7 @@ button {
 .ge-dropzone-help {
   max-width: 380px;
   margin: 0;
-  color: #7b8581;
+  color: var(--ge-help-text);
   font-size: 10px;
   line-height: 1.38;
 }
@@ -555,7 +698,7 @@ button {
   gap: 7px;
   min-height: 31px;
   padding: 8px 12px;
-  border: 1px solid #b7dad4;
+  border: 1px solid var(--ge-template-line);
   border-radius: var(--ge-radius);
   background: var(--ge-teal-soft);
   color: var(--ge-teal);
@@ -573,7 +716,7 @@ button {
   padding: 10px 12px;
   border: 1px solid var(--ge-line);
   border-radius: var(--ge-radius);
-  background: #f7fbfa;
+  background: var(--ge-surface-soft);
 }
 
 .ge-file-icon {
@@ -613,7 +756,7 @@ button {
   border: 0;
   border-radius: var(--ge-radius);
   background: transparent;
-  color: #6d7773;
+  color: var(--ge-file-action);
 }
 
 .ge-preview-panel {
@@ -632,7 +775,7 @@ button {
   overflow: auto;
   border: 1px solid var(--ge-line);
   border-radius: var(--ge-radius);
-  background: #fff;
+  background: var(--ge-surface-raised);
 }
 
 .ge-table-frame.is-leads {
@@ -644,7 +787,7 @@ button {
   min-width: 760px;
   border-collapse: separate;
   border-spacing: 0;
-  color: #222926;
+  color: var(--ge-table-ink);
   font-size: 12px;
 }
 
@@ -653,9 +796,9 @@ button {
   top: 0;
   z-index: 1;
   padding: 12px 14px;
-  background: #fff;
+  background: var(--ge-surface-raised);
   border-bottom: 1px solid var(--ge-line);
-  color: #111513;
+  color: var(--ge-ink);
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0;
@@ -668,8 +811,8 @@ button {
 .ge-data-table td {
   max-width: 210px;
   padding: 12px 14px;
-  border-bottom: 1px solid #edf1ef;
-  color: #3d4743;
+  border-bottom: 1px solid var(--ge-table-line);
+  color: var(--ge-table-text);
   line-height: 1.35;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -678,7 +821,7 @@ button {
 }
 
 .ge-data-table tbody tr:hover td {
-  background: #f9fbfa;
+  background: var(--ge-surface-hover);
 }
 
 .ge-data-table tbody tr:last-child td {
@@ -708,7 +851,7 @@ button {
 
 .ge-button-secondary {
   border: 1px solid var(--ge-line);
-  background: #fff;
+  background: var(--ge-surface-raised);
 }
 
 .ge-button-primary {
@@ -754,9 +897,9 @@ button {
   gap: 9px;
   margin-top: 14px;
   padding: 10px 12px;
-  border: 1px solid #ffd4d4;
+  border: 1px solid var(--ge-error-line);
   border-radius: var(--ge-radius);
-  background: #fff4f4;
+  background: var(--ge-error-bg);
   color: var(--ge-danger);
   font-size: 12px;
   font-weight: 700;
@@ -781,8 +924,8 @@ button {
   padding: 18px;
   border: 1px solid var(--ge-line);
   border-radius: 12px;
-  background: #f7fbfa;
-  box-shadow: 0 10px 22px rgba(17, 38, 32, 0.04);
+  background: var(--ge-surface-soft);
+  box-shadow: var(--ge-metric-shadow);
 }
 
 .ge-metric-card strong {
@@ -802,7 +945,7 @@ button {
 }
 
 .ge-metric-card.is-warning strong {
-  color: #e2792f;
+  color: var(--ge-orange);
 }
 
 .ge-toolbar-actions {
@@ -823,7 +966,7 @@ button {
   padding: 0 12px;
   border: 1px solid var(--ge-line);
   border-radius: var(--ge-radius);
-  background: #fff;
+  background: var(--ge-surface-raised);
   color: var(--ge-muted);
 }
 
@@ -842,7 +985,7 @@ button {
 }
 
 .ge-leads-table td strong {
-  color: #1f2825;
+  color: var(--ge-lead-name);
   font-weight: 800;
 }
 
@@ -859,23 +1002,23 @@ button {
 }
 
 .ge-status-pill.is-good {
-  background: #dff8e9;
-  color: #128343;
+  background: var(--ge-status-good-bg);
+  color: var(--ge-status-good-text);
 }
 
 .ge-status-pill.is-neutral {
-  background: #eef1f0;
-  color: #6b7471;
+  background: var(--ge-status-neutral-bg);
+  color: var(--ge-status-neutral-text);
 }
 
 .ge-status-pill.is-bad {
-  background: #ffe3e3;
-  color: #b83232;
+  background: var(--ge-status-bad-bg);
+  color: var(--ge-status-bad-text);
 }
 
 .ge-status-pill.is-sale {
-  background: #e5efff;
-  color: #2769d8;
+  background: var(--ge-status-sale-bg);
+  color: var(--ge-status-sale-text);
 }
 
 .ge-row-action {
@@ -886,8 +1029,8 @@ button {
   padding: 6px 9px;
   border: 1px solid var(--ge-line);
   border-radius: var(--ge-radius);
-  background: #fff;
-  color: #2e3835;
+  background: var(--ge-surface-raised);
+  color: var(--ge-row-action-text);
   font-size: 11px;
   font-weight: 800;
 }
@@ -895,7 +1038,7 @@ button {
 .ge-skipped-section {
   border: 1px solid var(--ge-line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--ge-surface-raised);
 }
 
 .ge-skipped-toggle {
@@ -924,9 +1067,9 @@ button {
   display: grid;
   gap: 8px;
   padding: 12px;
-  border: 1px solid #ffdada;
+  border: 1px solid var(--ge-skipped-line);
   border-radius: var(--ge-radius);
-  background: #fff6f6;
+  background: var(--ge-skipped-bg);
 }
 
 .ge-skipped-item strong {
@@ -937,7 +1080,7 @@ button {
 .ge-skipped-item pre {
   margin: 0;
   overflow: auto;
-  color: #6c7471;
+  color: var(--ge-pre-text);
   font-size: 11px;
   line-height: 1.45;
 }
@@ -967,7 +1110,7 @@ button {
     min-height: 64px;
     padding: 0 18px;
     border-bottom: 1px solid var(--ge-line);
-    background: rgba(255, 255, 255, 0.92);
+    background: var(--ge-mobile-header-bg);
     backdrop-filter: blur(12px);
   }
 
