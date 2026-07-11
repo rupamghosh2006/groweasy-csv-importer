@@ -70,6 +70,14 @@ const leadSourceCards = [
     color: '#4285f4',
     status: 'Not Connected',
     icon: 'G',
+    logoSvg: (
+      <svg viewBox="0 0 48 48" className="w-6 h-6">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+        <path fill="#FBBC05" d="M10.54 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 0 0 0 24c0 3.77.87 7.35 2.56 10.59l7.98-6z" />
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6C6.51 42.62 14.62 48 24 48z" />
+      </svg>
+    ),
   },
   {
     name: 'Facebook Leads',
@@ -77,6 +85,12 @@ const leadSourceCards = [
     color: '#1877f2',
     status: 'Not Connected',
     icon: 'f',
+    logoSvg: (
+      <svg viewBox="0 0 48 48" className="w-6 h-6">
+        <path fill="#1877F2" d="M24 0C10.74 0 0 10.74 0 24c0 13.26 10.74 24 24 24s24-10.74 24-24C48 10.74 37.26 0 24 0z" />
+        <path fill="#fff" d="M26.3 25.3h3.4l.6-4.5h-4v-2.9c0-1.3.4-2.2 2.2-2.2h2.4v-4c-.4-.1-1.8-.2-3.4-.2-3.4 0-5.7 2.1-5.7 5.9v3.3h-3.7v4.5h3.7V37h4.6V25.3z" />
+      </svg>
+    ),
   },
   {
     name: 'WhatsApp Business',
@@ -84,6 +98,12 @@ const leadSourceCards = [
     color: '#22c55e',
     status: 'Not Connected',
     icon: 'W',
+    logoSvg: (
+      <svg viewBox="0 0 48 48" className="w-6 h-6">
+        <path fill="#25D366" d="M24 0C10.74 0 0 10.74 0 24c0 5.16 1.63 9.93 4.4 13.82L2.4 45.6l7.93-1.98C14.17 45.97 18.96 48 24 48c13.26 0 24-10.74 24-24S37.26 0 24 0z" />
+        <path fill="#fff" d="M34.8 28.3c-.5-.3-3.1-1.5-3.6-1.7-.5-.2-.8-.3-1.2.3-.4.5-1.4 1.7-1.7 2-.3.4-.6.4-1.1.1-.5-.3-2-.7-3.8-2.3-1.4-1.2-2.4-2.7-2.7-3.1-.3-.4 0-.6.2-.8.2-.2.5-.5.7-.8.2-.3.3-.5.5-.8.2-.3.1-.6 0-.8-.1-.2-1.2-2.9-1.6-3.9-.4-1-.8-.9-1.1-.9h-1c-.4 0-1 .1-1.5.8-.5.7-2 2-2 4.9s2.1 5.7 2.4 6.1c.3.4 4.1 6.3 10 8.8 1.4.6 2.5 1 3.4 1.3 1.4.4 2.7.4 3.7.2 1.1-.2 3.4-1.4 3.9-2.7.5-1.4.5-2.5.3-2.8-.1-.2-.4-.3-.9-.6z" />
+      </svg>
+    ),
   },
   {
     name: 'Telephony',
@@ -91,6 +111,11 @@ const leadSourceCards = [
     color: '#0f766e',
     status: 'Not Connected',
     icon: 'T',
+    logoSvg: (
+      <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+      </svg>
+    ),
   },
 ];
 
@@ -402,7 +427,7 @@ function LeadSourcesPage({
             <article className="ge-provider-card" key={source.name}>
               <div className="ge-provider-head">
                 <span className="ge-provider-logo" style={{ '--source-color': source.color } as SourceStyle}>
-                  {source.icon}
+                  {source.logoSvg}
                 </span>
                 <button className="ge-more-button" type="button" aria-label={`More actions for ${source.name}`}>
                   <FiMoreHorizontal aria-hidden="true" />
