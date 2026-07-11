@@ -103,9 +103,12 @@ export default function Home() {
       <header className="border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-[#0f1a1a]/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[#294744] flex items-center justify-center">
-              <span className="text-white font-bold text-xs">G</span>
-            </div>
+            <svg width="28" height="28" viewBox="0 0 212 212" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="4" width="204" height="204" rx="44" stroke="#294744" stroke-width="12"/>
+              <path d="M153.512 102.25L28.3282 227.434L-11.2302 187.876L113.953 62.6921L153.512 102.25Z" fill="#294744"/>
+              <path d="M40.5302 62.6965H153.503V102.257H40.5302V62.6965Z" fill="#294744"/>
+              <path d="M153.503 62.6965V175.67H113.942L113.942 62.6965L153.503 62.6965Z" fill="#294744"/>
+            </svg>
             <span className="font-semibold text-sm text-[#294744] dark:text-[#4a9e9a]">GrowEasy</span>
           </div>
           <button
