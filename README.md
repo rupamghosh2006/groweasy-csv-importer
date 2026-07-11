@@ -73,7 +73,7 @@ groweasy/
 ├── server/                      # Express API (Render)
 │   └── src/
 │       ├── index.ts             # POST /api/import — batching, concurrency, retries
-│       ├── gemini.ts            # Groq AI client (OpenAI-compatible SDK)
+│       ├── groq.ts            # Groq AI client (OpenAI-compatible SDK)
 │       ├── prompt.ts            # AI prompt with 4 few-shot examples + response validator
 │       └── types.ts             # Shared types
 ├── samples/                     # Test CSV files
@@ -294,7 +294,7 @@ samples/messy-manual-sheet.csv
 - ✅ Multiple emails in one cell → first mapped, rest in notes
 - ✅ Multiple phones in one cell → first mapped, rest in notes
 - ✅ Ambiguous column headers (e.g. "Contact" = phone number)
-- ✅ Gemini/Groq API rate limits (429) → retries with backoff
+- ✅ groq/Groq API rate limits (429) → retries with backoff
 - ✅ Malformed AI JSON → retry mechanism
 - ✅ Maximum 5000 rows per request
 

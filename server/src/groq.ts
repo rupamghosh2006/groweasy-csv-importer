@@ -16,7 +16,7 @@ function getClient(): OpenAI {
   return client;
 }
 
-export async function askGemini(prompt: string): Promise<string> {
+export async function askgroq(prompt: string): Promise<string> {
   const openai = getClient();
 
   const completion = await openai.chat.completions.create({

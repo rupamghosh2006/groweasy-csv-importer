@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { buildImportPrompt, cleanAndParseResponse } from './prompt';
-import { askGemini } from './gemini';
+import { askgroq } from './groq';
 import type { CrmRecord, ImportResponse, SkippedRecord } from './types';
 
 dotenv.config();
@@ -33,7 +33,7 @@ async function processBatch(
   const prompt = buildImportPrompt(batch);
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const response = await askGemini(prompt);
+      const response = await askgroq(prompt);
       const result = cleanAndParseResponse(response);
       return result;
     } catch (error) {
