@@ -1,5 +1,8 @@
 # GrowEasy CRM CSV Importer
 
+[![Frontend CI/CD](https://github.com/rupamghosh2006/groweasy-csv-importer/actions/workflows/frontend.yml/badge.svg)](https://github.com/rupamghosh2006/groweasy-csv-importer/actions/workflows/frontend.yml)
+[![Server CI/CD](https://github.com/rupamghosh2006/groweasy-csv-importer/actions/workflows/server.yml/badge.svg)](https://github.com/rupamghosh2006/groweasy-csv-importer/actions/workflows/server.yml)
+
 AI-powered CSV importer that maps lead exports from different sources into a fixed GrowEasy CRM schema.
 
 The application lets users upload a CSV, preview the parsed rows, confirm the import, and receive normalized CRM records generated with Groq AI. Rows without an email or mobile number are skipped with a clear reason.
