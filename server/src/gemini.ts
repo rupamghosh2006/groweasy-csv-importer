@@ -1,31 +1,30 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
 
-let genAI: GoogleGenerativeAI | null = null;
+let client: OpenAI | null = null;
 
-function getGenAI(): GoogleGenerativeAI {
-  if (!genAI) {
-    const apiKey = process.env.GEMINI_API_KEY;
+function getClient(): OpenAI {
+  if (!client) {
+    const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
-      throw new Error('GEMINI_API_KEY environment variable is not set');
+      throw new Error('GROQ_API_KEY environment variable is not set');
     }
-    genAI = new GoogleGenerativeAI(apiKey);
+    client = new OpenAI({
+      apiKey,
+      baseURL: 'https://api.groq.com/openai/v1',
+    });
   }
-  return genAI;
+  return client;
 }
 
 export async function askGemini(prompt: string): Promise<string> {
-  const ai = getGenAI();
-  const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash' });
+  const openai = getClient();
 
-  const result = await model.generateContent({
-    contents: [{ role: 'user', parts: [{ text: prompt }] }],
-    generationConfig: {
-      temperature: 0.1,
-      topP: 0.95,
-      maxOutputTokens: 8192,
-    },
+  const completion = await openai.chat.completions.create({
+    model: 'llama-3.3-70b-versatile',
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.1,
+    max_tokens: 8192,
   });
 
-  const response = result.response;
-  return response.text();
+  return completion.choices[0]?.message?.content || '';
 }

@@ -13,7 +13,7 @@ Upload any CSV (Facebook Leads, Google Ads, real-estate CRMs, manual spreadsheet
 |---|---|
 | Frontend | Next.js (App Router), TypeScript, Tailwind CSS |
 | Backend | Node.js + Express, TypeScript |
-| AI | Google Gemini 2.0 Flash API |
+| AI | Groq (Llama 3.3 70B) — free tier |
 | CSV Parsing | PapaParse (frontend) |
 | Database | None (stateless, in-memory processing) |
 
@@ -42,7 +42,7 @@ groweasy/
 ### Prerequisites
 
 - Node.js 18+
-- A Gemini API key from [Google AI Studio](https://aistudio.google.com/)
+- A Groq API key from [Groq Console](https://console.groq.com) (free)
 
 ### 1. Clone
 
@@ -58,10 +58,10 @@ cd server
 cp .env.example .env
 ```
 
-Edit `server/.env` and set your Gemini key:
+Edit `server/.env` and set your Groq key:
 
 ```
-GEMINI_API_KEY=your_actual_gemini_api_key
+GROQ_API_KEY=your_actual_groq_api_key
 ```
 
 Install and run:
@@ -168,7 +168,7 @@ Set environment variable in Vercel dashboard:
    - **Build Command:** `npm install && npx tsc`
    - **Start Command:** `node dist/index.js`
 5. Add environment variable:
-   - `GEMINI_API_KEY` = your Gemini API key
+   - `GROQ_API_KEY` = your Groq API key
    - `PORT` = 10000 (Render automatically sets this)
    - `NODE_VERSION` = 18
 
