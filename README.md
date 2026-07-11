@@ -7,6 +7,22 @@ AI-powered CSV importer that maps lead exports from different sources into a fix
 
 The application lets users upload a CSV, preview the parsed rows, confirm the import, and receive normalized CRM records generated with Groq AI. Rows without an email or mobile number are skipped with a clear reason.
 
+## Quick Navigation
+
+| Need | Section |
+| --- | --- |
+| Live app and repository links | [Links](#links) |
+| Main product features | [Features](#features) |
+| Tech stack overview | [Tech Stack](#tech-stack) |
+| Folder layout | [Project Structure](#project-structure) |
+| Run locally without Docker | [Local Setup](#local-setup) |
+| Run full stack with Docker | [Docker Setup](#docker-setup) |
+| Backend request/response contract | [API](#api) |
+| CRM output fields and mapping rules | [CRM Schema](#crm-schema) |
+| Sample CSV files | [Sample Data](#sample-data) |
+| Build and type checks | [Quality Checks](#quality-checks) |
+| Hosted deployment details | [Deployment](#deployment) |
+
 ## Links
 
 | Resource | URL |
@@ -45,6 +61,7 @@ groweasy/
   server/            Express API
   samples/           Sample CSV files for manual testing
   assets/            Project assets
+  docker-compose.yml Docker setup for local full-stack runs
   .github/workflows/ GitHub Actions workflows
 ```
 
@@ -92,6 +109,42 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
 The frontend runs at `http://localhost:3000`.
+
+## Docker Setup
+
+Use Docker to run the frontend and backend together in production mode.
+
+```bash
+cp .env.example .env
+```
+
+Update `.env` with your Groq API key:
+
+```env
+GROQ_API_KEY=your_groq_api_key_here
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
+
+Start both containers:
+
+```bash
+docker compose up --build
+```
+
+The app will be available at:
+
+| Service | URL |
+| --- | --- |
+| Frontend | http://localhost:3000 |
+| Backend API | http://localhost:3001 |
+
+Stop the containers:
+
+```bash
+docker compose down
+```
+
+If you change `NEXT_PUBLIC_API_URL`, rebuild the frontend image because Next.js bundles public environment variables during build.
 
 ## API
 
